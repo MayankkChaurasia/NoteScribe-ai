@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NoteScribe AI</title>
+  <link rel="stylesheet" href="popup.css" />
+</head>
+<body>
+  <!-- ═══════════════════════════════════════════════════
+       HEADER
+  ═══════════════════════════════════════════════════ -->
+  <header class="app-header">
+    <div class="logo">
+      <div class="logo-icon">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+          <path d="M10 2C10 2 4 5 4 10C4 13.31 6.69 16 10 16C13.31 16 16 13.31 16 10C16 5 10 2 10 2Z" fill="var(--accent)"/>
+          <circle cx="10" cy="10" r="3" fill="var(--bg-primary)"/>
+          <line x1="10" y1="16" x2="10" y2="18" stroke="var(--accent)" stroke-width="2" stroke-linecap="round"/>
+          <line x1="7" y1="18" x2="13" y2="18" stroke="var(--accent)" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <span class="logo-text">NoteScribe <em>AI</em></span>
+    </div>
+    <div class="header-actions">
+      <button class="icon-btn" id="historyBtn" title="Previous meetings">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M8 5V8L10 10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      </button>
+      <button class="icon-btn" id="settingsBtn" title="Settings">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <circle cx="8" cy="8" r="2.5" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M8 1V3M8 13V15M1 8H3M13 8H15M2.93 2.93L4.34 4.34M11.66 11.66L13.07 13.07M2.93 13.07L4.34 11.66M11.66 4.34L13.07 2.93" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- ═══════════════════════════════════════════════════
+       SETTINGS PANEL (hidden by default)
+  ═══════════════════════════════════════════════════ -->
+  <div class="settings-panel hidden" id="settingsPanel">
+    <h3 class="panel-title">Settings</h3>
+    <div class="setting-group">
+      <label class="setting-label">OpenAI API Key</label>
+      <div class="input-wrapper">
+        <input type="password" id="apiKeyInput" class="setting-input" placeholder="sk-..." />
+        <button class="save-key-btn" id="saveApiKey">Save</button>
+      </div>
+      <p class="setting-hint">Required for AI transcription & notes. <a href="https://platform.openai.com/api-keys" target="_blank">Get key →</a></p>
+    </div>
+    <div class="setting-group">
+      <label class="setting-label">Audio Source</label>
+      <div class="toggle-group">
+        <button class="toggle-btn active" data-source="mic" id="srcMic">Microphone</button>
+        <button class="toggle-btn" data-source="tab" id="srcTab">Tab Audio</button>
+      </div>
+    </div>
+    <div class="setting-group">
+      <label class="setting-label">Transcription Engine</label>
+      <div class="toggle-group">
+        <button class="toggle-btn active" data-engine="browser" id="engBrowser">Browser API</button>
+        <button class="toggle-btn" data-engine="whisper" id="engWhisper">Whisper AI</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════
+       HISTORY PANEL (hidden by default)
+  ═══════════════════════════════════════════════════ -->
+  <div class="history-panel hidden" id="historyPanel">
+    <div class="panel-header">
+      <h3 class="panel-title">Previous Meetings</h3>
+      <button class="text-btn danger" id="clearHistory">Clear all</button>
+    </div>
+    <div class="history-search">
+      <svg class="search-icon" width="14" height="14" viewBox="0 0 14 14" fill="none">
+        <circle cx="6" cy="6" r="4.5" stroke="currentColor" stroke-width="1.5"/>
+        <path d="M9.5 9.5L12.5 12.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+      <input type="text" id="searchInput" class="search-input" placeholder="Search transcripts..." />
+    </div>
+    <div class="history-list" id="historyList">
+      <div class="empty-state">
+        <svg width="32" height="32" viewBox="0 0 32 32" fill="none" opacity="0.3">
+          <path d="M16 4C9.37 4 4 9.37 4 16s5.37 12 12 12 12-5.37 12-12S22.63 4 16 4zm0 2c5.52 0 10 4.48 10 10s-4.48 10-10 10S6 21.52 6 16 10.48 6 16 6zm-1 4v7h6v-2h-4V10h-2z" fill="currentColor"/>
+        </svg>
+        <p>No recordings yet</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════
+       MAIN CONTENT
+  ═══════════════════════════════════════════════════ -->
+  <main class="main-content" id="mainContent">
+
+    <!-- RECORDING SECTION -->
+    <section class="record-section">
+      <!-- Status indicator -->
+      <div class="status-bar" id="statusBar">
+        <div class="status-dot idle" id="statusDot"></div>
+        <span class="status-text" id="statusText">Ready to record</span>
+        <span class="timer hidden" id="timer">00:00</span>
+      </div>
+
+      <!-- Waveform visualizer -->
+      <div class="waveform-container" id="waveformContainer">
+        <canvas id="waveformCanvas" width="380" height="64"></canvas>
+        <div class="idle-waveform" id="idleWaveform">
+          <span></span><span></span><span></span><span></span><span></span>
+          <span></span><span></span><span></span><span></span><span></span>
+          <span></span><span></span><span></span><span></span><span></span>
+        </div>
+      </div>
+
+      <!-- Controls -->
+      <div class="controls">
+        <button class="btn-record" id="recordBtn">
+          <div class="record-icon">
+            <div class="record-circle"></div>
+          </div>
+          <span id="recordBtnText">Start Recording</span>
+        </button>
+      </div>
+
+      <!-- Audio source indicator -->
+      <div class="source-indicator" id="sourceIndicator">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+          <path d="M6 1C4.9 1 4 1.9 4 3V6C4 7.1 4.9 8 6 8C7.1 8 8 7.1 8 6V3C8 1.9 7.1 1 6 1Z" fill="currentColor"/>
+          <path d="M2 5V6C2 8.21 3.79 10 6 10C8.21 10 10 8.21 10 6V5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+          <line x1="6" y1="10" x2="6" y2="11.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+        </svg>
+        <span id="sourceLabel">Microphone</span>
+      </div>
+    </section>
+
+    <!-- TABS -->
+    <div class="tab-bar" id="tabBar">
+      <button class="tab active" data-tab="transcript">Transcript</button>
+      <button class="tab" data-tab="notes">AI Notes</button>
+      <button class="tab" data-tab="insights">Insights</button>
+    </div>
+
+    <!-- TRANSCRIPT TAB -->
+    <div class="tab-content active" id="tab-transcript">
+      <div class="transcript-toolbar">
+        <span class="word-count" id="wordCount">0 words</span>
+        <button class="text-btn" id="clearTranscript">Clear</button>
+      </div>
+      <div class="transcript-viewer" id="transcriptViewer">
+        <div class="transcript-placeholder" id="transcriptPlaceholder">
+          <svg width="40" height="40" viewBox="0 0 40 40" fill="none" opacity="0.2">
+            <path d="M8 10h24M8 16h24M8 22h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          <p>Your transcript will appear here as you speak...</p>
+        </div>
+        <div class="transcript-text" id="transcriptText"></div>
+      </div>
+      <div class="generate-section">
+        <button class="btn-generate" id="generateBtn" disabled>
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M8 1L10 6H15L11 9.5L12.5 14.5L8 11.5L3.5 14.5L5 9.5L1 6H6L8 1Z" fill="currentColor"/>
+          </svg>
+          Generate AI Notes
+        </button>
+      </div>
+    </div>
+
+    <!-- NOTES TAB -->
+    <div class="tab-content hidden" id="tab-notes">
+      <div class="notes-placeholder" id="notesPlaceholder">
+        <svg width="40" height="40" viewBox="0 0 40 40" fill="none" opacity="0.2">
+          <path d="M8 8h24v4H8zM8 16h24v4H8zM8 24h16v4H8z" fill="currentColor"/>
+        </svg>
+        <p>Generate AI Notes to see structured notes here</p>
+      </div>
+      <div class="notes-content hidden" id="notesContent">
+        <div class="notes-loading hidden" id="notesLoading">
+          <div class="loading-spinner"></div>
+          <span>Generating notes...</span>
+        </div>
+        <div id="notesOutput"></div>
+      </div>
+    </div>
+
+    <!-- INSIGHTS TAB -->
+    <div class="tab-content hidden" id="tab-insights">
+      <div class="insights-placeholder" id="insightsPlaceholder">
+        <svg width="40" height="40" viewBox="0 0 40 40" fill="none" opacity="0.2">
+          <circle cx="20" cy="20" r="14" stroke="currentColor" stroke-width="2"/>
+          <path d="M20 12v8l5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <p>Meeting insights will appear after generating notes</p>
+      </div>
+      <div class="insights-content hidden" id="insightsContent">
+        <div id="insightsOutput"></div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ═══════════════════════════════════════════════════
+       FOOTER / EXPORT BAR
+  ═══════════════════════════════════════════════════ -->
+  <footer class="export-bar hidden" id="exportBar">
+    <span class="export-label">Export</span>
+    <div class="export-actions">
+      <button class="export-btn" id="copyBtn" title="Copy to clipboard">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+          <rect x="4" y="4" width="8" height="8" rx="1.5" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M2 10V3C2 2.45 2.45 2 3 2H10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        Copy
+      </button>
+      <button class="export-btn" id="markdownBtn" title="Export as Markdown">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+          <path d="M1 3h12v8H1zM3 9V5l2 2 2-2v4M9 7l2-2v4M11 5v4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        .MD
+      </button>
+      <button class="export-btn" id="pdfBtn" title="Export as PDF">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+          <path d="M3 1h5.5L11 3.5V13H3V1z" stroke="currentColor" stroke-width="1.2"/>
+          <path d="M8 1v3h3" stroke="currentColor" stroke-width="1.2"/>
+          <path d="M5 7h4M5 9.5h2.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+        </svg>
+        PDF
+      </button>
+      <button class="export-btn" id="downloadTranscriptBtn" title="Download transcript">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+          <path d="M7 2v7M4.5 6.5L7 9l2.5-2.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M2 11h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        TXT
+      </button>
+    </div>
+  </footer>
+
+  <!-- Toast notification -->
+  <div class="toast hidden" id="toast"></div>
+
+  <script src="utils.js"></script>
+  <script src="recorder.js"></script>
+  <script src="ai.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>
