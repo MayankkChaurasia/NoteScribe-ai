@@ -1,0 +1,1 @@
+NoteScribe AI is a powerful Chrome extension designed to turn every meeting into structured knowledge. Record lectures or calls with tab/microphone capture, get real-time transcriptions, and generate automated AI notes using GPT-4o-mini. Extract action items, key concepts, and deadlines instantly. Secure, local storage with versatile export options.

@@ -1,100 +1,84 @@
-# NoteScribe AI — Chrome Extension
+<div align="center">
 
-> Record meetings & lectures, transcribe audio, and generate structured AI notes automatically.
+<img src="media/hero.png" alt="NoteScribe AI Hero" width="100%" />
 
----
+# 🎙️ NoteScribe AI
+### *Turn Every Meeting into Structured Knowledge*
 
-## Features
-
-- 🎙️ **Audio Recording** — Microphone or tab audio capture with waveform visualization
-- 📝 **Live Transcription** — Real-time speech-to-text using browser Web Speech API
-- 🤖 **AI Notes** — GPT-4o-mini generates summary, key points, action items, concepts
-- 🔍 **Meeting Insights** — Extracts tasks, decisions, deadlines, and follow-ups
-- 👥 **Speaker Segmentation** — Basic turn-based speaker detection
-- 💾 **History** — Saves last 30 sessions locally, searchable
-- 📤 **Export** — Markdown, PDF, plain text, or clipboard
+[![Version](https://img.shields.io/badge/version-1.0.0-blue.svg?style=for-the-badge)](https://github.com/MayankkChaurasia/NoteScribe-ai)
+[![License](https://img.shields.io/badge/license-MIT-green.svg?style=for-the-badge)](LICENSE)
+[![Platform](https://img.shields.io/badge/platform-Chrome-orange.svg?style=for-the-badge)](https://chrome.google.com/webstore)
 
 ---
 
-## Setup
+**NoteScribe AI** is a professional Chrome extension designed to automate the heavy lifting of meeting and lecture documentation. Capture high-quality audio, witness real-time transcription, and let AI distill hours of talk into actionable insights in seconds.
 
-### 1. Load the extension
+[**Features**](#-key-features) • [**Setup**](#-quick-start) • [**Usage**](#-how-it-works) • [**Tech Stack**](#-built-with)
 
-1. Open Chrome and go to `chrome://extensions`
-2. Enable **Developer mode** (top right toggle)
-3. Click **Load unpacked**
-4. Select this `notescribe-ai` folder
+</div>
 
-### 2. Add your OpenAI API key (optional but recommended)
+## ✨ Key Features
 
-1. Click the NoteScribe AI extension icon
-2. Click the ⚙️ Settings icon
-3. Paste your OpenAI API key (`sk-...`)
-4. Click **Save**
+<div align="center">
+<img src="media/features.png" alt="Features Visualization" width="80%" />
+</div>
 
-> Without an API key: Uses browser's built-in Speech Recognition for transcription and generates demo notes.
-> With an API key: Uses Whisper for high-quality transcription + GPT-4o-mini for real AI notes.
-
-Get your API key at [platform.openai.com/api-keys](https://platform.openai.com/api-keys)
+- 🎙️ **Multi-Source Capture** — Record high-fidelity audio from your microphone or directly from the active browser tab.
+- 📝 **Live Transcription** — Real-time speech-to-text powered by the Web Speech API or high-accuracy Whisper.
+- 🤖 **AI-Driven Notes** — Automatically generate summaries, key points, and action items using GPT-4o-mini.
+- 🔍 **Deep Insights** — Extract decisions, deadlines, and concepts from complex discussions.
+- 📂 **Session History** — Effortlessly manage and search through your last 30 recordings stored locally.
+- 📤 **Versatile Export** — Save your work as Markdown, PDF, or Plain Text with one click.
 
 ---
 
-## Usage
+## 📸 Interface Preview
 
-1. Click the extension icon in the Chrome toolbar
-2. Choose audio source (Microphone or Tab Audio) in Settings
-3. Click **Start Recording**
-4. Speak, present, or let the meeting run
-5. Click **Stop Recording** when done
-6. Review your transcript in the **Transcript** tab
-7. Click **Generate AI Notes** for structured notes
-8. Check **Insights** for tasks, decisions, and deadlines
-9. Export using the buttons in the footer
+<div align="center">
+<img src="media/mockup.png" alt="NoteScribe UI Mockup" width="90%" />
+<p><i>Modern glassmorphism interface with real-time waveform and structured AI insights.</i></p>
+</div>
 
 ---
 
-## File Structure
+## 🚀 Quick Start
 
-```
-notescribe-ai/
-├── manifest.json      — Extension manifest (MV3)
-├── popup.html         — Main popup UI
-├── popup.css          — Dark theme styles
-├── popup.js           — UI controller / orchestration
-├── recorder.js        — Audio recording + waveform visualization
-├── ai.js              — Whisper transcription + GPT notes generation
-├── utils.js           — Storage, export (MD/PDF/TXT), helpers
-├── background.js      — Service worker (tab capture, keep-alive)
-├── content.js         — Page integration + platform detection
-└── icons/             — Extension icons (16, 48, 128px)
-```
+### 1. Installation
+1. Download or clone this repository.
+2. Navigate to `chrome://extensions` in your browser.
+3. Enable **Developer mode** in the top-right corner.
+4. Click **Load unpacked** and select the `notescribe-ai` folder.
+
+### 2. Configuration (Optional)
+Click the extension icon and open **Settings** ⚙️ to add your **OpenAI API Key**. 
+> **Note:** Without a key, the extension uses browser-native speech recognition. With a key, it unlocks the full power of Whisper and GPT-4o-mini.
 
 ---
 
-## Keyboard Shortcut
+## 🛠️ Built With
 
-**Alt + Shift + R** — Toggle recording from any tab
+NoteScribe AI leverages a modern tech stack to provide a seamless, secure experience:
 
----
-
-## Privacy
-
-- All recordings are processed locally or sent directly to OpenAI's API
-- No data is sent to any third-party servers
-- Sessions are stored in Chrome's local storage (only on your device)
-
----
-
-## Tech Stack
-
-- **Chrome Extension**: Manifest V3
-- **Frontend**: Vanilla HTML, CSS, JavaScript
-- **Audio**: MediaRecorder API + Web Audio API (waveform)
-- **Transcription**: Web Speech API (browser) or OpenAI Whisper API
-- **AI Notes**: OpenAI GPT-4o-mini
-- **Storage**: Chrome Storage API (local)
-- **Export**: Blob + File API (MD/TXT), Print API (PDF)
+| Component | Technology |
+| :--- | :--- |
+| **Framework** | Chrome Extension Manifest V3 |
+| **Frontend** | Pure HTML5, CSS3 (Glassmorphism), Vanilla JS |
+| **Audio Processing** | MediaRecorder & Web Audio API |
+| **AI Engine** | OpenAI GPT-4o-mini & Whisper |
+| **Transcription** | Web Speech API |
+| **Storage** | Chrome Local Storage API |
 
 ---
 
-*Built with NoteScribe AI — turn every meeting into structured knowledge.*
+## 🔒 Privacy & Security
+
+- **Local Processing**: Your audio recordings are processed locally on your device.
+- **Direct AI Connection**: Data for transcription/notes is sent directly to OpenAI's API; no middle-man servers are involved.
+- **Zero Tracking**: We do not track your usage or collect personal data. Everything stays in your browser's local storage.
+
+---
+
+<div align="center">
+<p>Built with ❤️ by the NoteScribe AI Team</p>
+<b>Turn every word into a win.</b>
+</div>
